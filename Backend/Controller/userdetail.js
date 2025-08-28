@@ -88,44 +88,45 @@ export const login = async(req, res) => {
     if(!email || !password){
         return res.status(400).json({
             sucess:false,
-            message:"All field are required",
+            message:"All fields are required",
         })
     }
     const user = await createUser.findOne({email})
     console.log(email);
     console.log(user);
     if(!user){
-        return res.json(400).json({
+        return res.status(400).json({
             sucess:false,
-            messsage:"Invalid email or password",
+            message:"Invalid email or password",
         })
     }
     const passwordvalidation =  await bcrypt.compare(password,user.password)
     if(!passwordvalidation){
         return res.status(400).json({
             sucess:false,
-            message:"Invalid password",
+            message:"Invalid email or password",
         })
     }
-    const token = Jwt.sign({userId : user ._id },process.env.SCERATE_KEY,{
+    const jwtSecret = process.env.SECRET_KEY || process.env.SCERATE_KEY;
+    const token = Jwt.sign({userId : user ._id }, jwtSecret,{
         expiresIn:"7d"
     })
-    res.cookie("jwt",token,{
-        maxAge: 24*60*60*1000,
-        httpOnly:true,
-        sameSite:"strict",
+    res.cookie("jwt", token, {
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
     })
 
     return res.status(200).json({
         sucess:true,
         message:`welcome back ${user.firstname}`,
-        user
+        user,
+        token
     });
         
     } catch (error) {
-
-
-        return res.json(500).json({
+        return res.status(500).json({
             sucess:false,
             message:"failed to login"
         })

@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 
-const PORT = process.env.PORT||8000;
+const PORT = process.env.PORT;
 const MONGO_DB = process.env.MONGO_DB
 
 
@@ -24,7 +24,8 @@ app.use('/api/users',userRouter)
 
 connectDB(MONGO_DB)
 .then(() => {
-    app.listen(PORT,() => console.log(`port is running on ${PORT}`))
+    const listenPort = PORT || 8000;
+    app.listen(listenPort,() => console.log(`port is running on ${listenPort}`))
 })
 .catch((error) => {
     console.log("Database is failed to connect");

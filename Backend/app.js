@@ -3,9 +3,26 @@ import cors from "cors"
 const app = express();
 
 
+// trust proxy for secure cookies behind reverse proxies (Render/Railway)
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174')
+    .split(',')
+    .map((o) => o.trim());
+const allowAllInDev = process.env.CORS_ALLOW_ALL === 'true' || process.env.NODE_ENV !== 'production';
+
 app.use(
     cors({
-        origin:'http://localhost:5173',
+        origin: allowAllInDev
+            ? true // reflect request origin in dev
+            : (origin, callback) => {
+                if (!origin || allowedOrigins.includes(origin)) {
+                    return callback(null, true);
+                }
+                return callback(new Error('Not allowed by CORS'));
+            },
         credentials:true
     })
 )
