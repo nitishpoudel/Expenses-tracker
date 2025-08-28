@@ -73,12 +73,14 @@ export default function SignUpForm() {
     setErrors({});
     
     try {
-      // Replace this URL with your actual API endpoint
-      const response = await fetch('http://localhost:8000/api/users/register', {
+      const inferredHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+      const apiBase = import.meta.env.VITE_API_BASE_URL || `http://${inferredHost}:8000`;
+      const response = await fetch(`${apiBase}/api/users/register`, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
   },
+  credentials: 'include',
   body: JSON.stringify({
     name: formData.name,
     email: formData.email,

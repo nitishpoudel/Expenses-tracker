@@ -2,7 +2,8 @@ import { Navigate, BrowserRouter as Router, Routes, Route } from "react-router-d
 import './App.css'; 
 import LoginForm from '../Components/Login';
 import SignUpForm from '../Components/Signup';
-import Mainmenu from '../Components/Mainmenu';
+import ExpenseTracker from "../Components/Mainmenu";
+
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
         <Route path="/signup" element={<SignUpForm />} />
 
         {/* Dashboard Page */}
-        <Route path="/dashboard" element={<Mainmenu />} />
+        <Route path="/dashboard" element={<ExpenseTracker />} />
       </Routes>
     </Router>
   );

@@ -59,9 +59,12 @@ export default function LoginForm() {
     setErrors({});
     
     try {
-      const response = await fetch('http://localhost:8000/api/users/login', {
+      const inferredHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+      const apiBase = import.meta.env.VITE_API_BASE_URL || `http://${inferredHost}:8000`;
+      const response = await fetch(`${apiBase}/api/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({
       email: formData.email,
       password: formData.password,
@@ -84,14 +87,7 @@ export default function LoginForm() {
     setErrors({ submit: result.message || 'Invalid email or password' });
   }
     } catch (error) {
-      // For demo purposes, simulate success after 2 seconds
-      setTimeout(() => {
-        setIsSuccess(true);
-        setFormData({ email: '', password: '' });
-        setIsLoading(false);
-        navigate('/dashboard');
-      }, 4000);
-      return;
+      setErrors({ submit: 'Network error. Please try again.' });
     }
     
     setIsLoading(false);
