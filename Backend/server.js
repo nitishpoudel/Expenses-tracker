@@ -29,8 +29,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/users',userRouter)
 
-// For Vercel serverless functions, we need to export the app
-// and handle database connection differently
+
 let isConnected = false;
 
 const connectToDatabase = async () => {
@@ -45,8 +44,19 @@ const connectToDatabase = async () => {
     }
 };
 
-// Connect to database when the module loads
-connectToDatabase();
+// Middleware to ensure database connection before handling requests
+app.use(async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (error) {
+        console.error('Database connection error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Database connection failed'
+        });
+    }
+});
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
