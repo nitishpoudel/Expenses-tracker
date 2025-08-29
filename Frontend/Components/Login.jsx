@@ -60,7 +60,7 @@ export default function LoginForm() {
     setErrors({});
     
     try {
-      const response = await fetch(API_ENDPOINTS.LOGIN, {
+      const response = await fetch('http://localhost:8000/api/users/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

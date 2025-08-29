@@ -74,39 +74,38 @@ export default function SignUpForm() {
     setErrors({});
     
     try {
-      const response = await fetch(API_ENDPOINTS.REGISTER, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  credentials: 'include',
-  body: JSON.stringify({
-    name: formData.name,
-    email: formData.email,
-    password: formData.password
-  }),
-});
-        const result = await response.json();
-  console.log("Response:", response.status, result);
-       if (response.ok) {
-  setIsSuccess(true);
-  setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-  navigate('/login');
-} else {
-  setErrors({ submit: result.message || 'Something went wrong' });
-}
-    } catch (error) {
-      // For demo purposes, simulate success after 2 seconds
-      setTimeout(() => {
+      const response = await fetch('http://localhost:8000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      const result = await response.json();
+      console.log('Response data:', result);
+
+      if (response.ok) {
         setIsSuccess(true);
         setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-        setIsLoading(false);
-        navigate('/login');
-      }, 2000);
-      return;
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setErrors({ submit: result.message || 'Registration failed. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrors({ submit: 'Network error. Please check your connection and try again.' });
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   if (isSuccess) {
