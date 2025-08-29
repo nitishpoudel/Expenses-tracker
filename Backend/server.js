@@ -4,7 +4,7 @@ import dotenv from "dotenv"
 import { connectDB } from "./Database/index.js";
 import userRouter from "./Routes/userroute.js";
 
-// Load environment variables - don't specify path for Vercel
+
 dotenv.config();
 
 //Default middleware//
@@ -19,13 +19,7 @@ app.get('/home',(req,res) => {
 })
 
 // Health check endpoint for Vercel
-app.get('/api/health', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Server is running',
-        timestamp: new Date().toISOString()
-    });
-});
+
 
 app.use('/api/users',userRouter)
 

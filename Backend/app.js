@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174,https://expenses-tracker-brown-eta.vercel.app,https://expenses-tracker-5acj.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'https://expenses-tracker-brown-eta.vercel.app')
     .split(',')
     .map((o) => o.trim());
 const allowAllInDev = process.env.CORS_ALLOW_ALL === 'true' || process.env.NODE_ENV !== 'production';
