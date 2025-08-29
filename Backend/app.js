@@ -51,4 +51,4 @@ app.use('*', (req, res) => {
     });
 });
 
-export {app}
+export default app;

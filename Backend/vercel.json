@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "api/simple.js": {
+    "api/serverless.js": {
       "maxDuration": 30
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/simple.js"
+      "destination": "/api/serverless.js"
     }
   ]
 }
