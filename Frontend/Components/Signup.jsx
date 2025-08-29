@@ -73,8 +73,8 @@ export default function SignUpForm() {
     setErrors({});
     
     try {
-      const inferredHost = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-      const apiBase = import.meta.env.VITE_API_BASE_URL || `http://${inferredHost}:8000`;
+      // For Vercel deployment, use the backend URL directly
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-app.vercel.app';
       const response = await fetch(`${apiBase}/api/users/register`, {
   method: 'POST',
   headers: {
