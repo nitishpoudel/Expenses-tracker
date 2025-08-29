@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 // CORS configuration
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174,https://expenses-tracker-brown-eta.vercel.app')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:5174,https://expenses-tracker-brown-eta.vercel.app,https://expenses-tracker-5acj.vercel.app')
     .split(',')
     .map((o) => o.trim());
 const allowAllInDev = process.env.CORS_ALLOW_ALL === 'true' || process.env.NODE_ENV !== 'production';
@@ -23,9 +23,13 @@ app.use(
                 if (!origin || allowedOrigins.includes(origin)) {
                     return callback(null, true);
                 }
+                console.log('CORS blocked origin:', origin);
+                console.log('Allowed origins:', allowedOrigins);
                 return callback(new Error('Not allowed by CORS'));
             },
-        credentials: true
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     })
 );
 
@@ -68,7 +72,20 @@ app.get('/api/health', (req, res) => {
     res.json({
         success: true,
         message: 'Server is running',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        cors: {
+            allowedOrigins: allowedOrigins,
+            allowAllInDev: allowAllInDev
+        }
+    });
+});
+
+app.get('/api/cors-test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'CORS test successful',
+        origin: req.headers.origin,
+        allowedOrigins: allowedOrigins
     });
 });
 
