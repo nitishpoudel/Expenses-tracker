@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { API_ENDPOINTS } from '../src/config/api.js';
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -73,9 +74,7 @@ export default function SignUpForm() {
     setErrors({});
     
     try {
-      // For Vercel deployment, use the backend URL directly
-      const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-app.vercel.app';
-      const response = await fetch(`${apiBase}/api/users/register`, {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',

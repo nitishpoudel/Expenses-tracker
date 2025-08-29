@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { API_ENDPOINTS } from '../src/config/api.js';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -59,9 +60,7 @@ export default function LoginForm() {
     setErrors({});
     
     try {
-      // For Vercel deployment, use the backend URL directly
-      const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-app.vercel.app';
-      const response = await fetch(`${apiBase}/api/users/login`, {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
