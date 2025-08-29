@@ -1,5 +1,4 @@
 import app from "./app.js";
-import express from "express"
 import dotenv from "dotenv"
 import { connectDB } from "./Database/index.js";
 import userRouter from "./Routes/userroute.js";
@@ -7,22 +6,8 @@ import userRouter from "./Routes/userroute.js";
 
 dotenv.config();
 
-//Default middleware//
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-
 const PORT = process.env.PORT;
 const MONGO_DB = process.env.MONGO_DB
-
-app.get('/home',(req,res) => {
-    res.send('hello')
-})
-
-// Health check endpoint for Vercel
-
-
-app.use('/api/users',userRouter)
-
 
 let isConnected = false;
 
@@ -34,6 +19,7 @@ const connectToDatabase = async () => {
             console.log("Database connected successfully");
         } catch (error) {
             console.log("Database failed to connect:", error);
+            throw error;
         }
     }
 };
@@ -51,6 +37,13 @@ app.use(async (req, res, next) => {
         });
     }
 });
+
+// Add routes to the app (after database connection middleware)
+app.get('/home',(req,res) => {
+    res.send('hello')
+})
+
+app.use('/api/users',userRouter)
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {

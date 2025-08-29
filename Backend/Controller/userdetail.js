@@ -18,8 +18,11 @@ export const register = async (req, res) => {
             finalLastName = finalLastName || (parts.slice(1).join(' ') || '');
         }
 
+        console.log("Processed data:", { finalFirstName, finalLastName, email, password });
+
         // Validate required fields
         if (!finalFirstName || !finalLastName || !email || !password) {
+            console.log("Validation failed:", { finalFirstName, finalLastName, email, password });
             return res.status(400).json({
                 success: false,
                 message: "All fields must be filled",
@@ -29,6 +32,7 @@ export const register = async (req, res) => {
         // Validate email format
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email)) {
+            console.log("Invalid email format:", email);
             return res.status(400).json({
                 success: false,
                 message: "Invalid email format",
@@ -37,24 +41,29 @@ export const register = async (req, res) => {
 
         // Validate password length
         if (password.length < 6) {
+            console.log("Password too short:", password.length);
             return res.status(400).json({
                 success: false,
                 message: "Password must contain at least 6 characters",
             });
         }
 
+        console.log("Checking if email exists:", email);
         // Check if the email already exists
         const existingEmail = await createUser.findOne({ email });
         if (existingEmail) {
+            console.log("Email already exists:", email);
             return res.status(400).json({
                 success: false,
                 message: "User already exists",
             });
         }
 
+        console.log("Hashing password...");
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        console.log("Creating user...");
         // Create the user (await the promise!)
         const newUser = await createUser.create({
             firstname: finalFirstName,
@@ -62,6 +71,8 @@ export const register = async (req, res) => {
             email,
             password: hashedPassword,
         });
+
+        console.log("User created successfully:", newUser._id);
 
         return res.status(201).json({
             success: true,
@@ -75,9 +86,11 @@ export const register = async (req, res) => {
         });
     } catch (error) {
         console.error("Error during registration:", error);
+        console.error("Error stack:", error.stack);
         return res.status(500).json({
             success: false,
             message: "Failed to register user",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 };

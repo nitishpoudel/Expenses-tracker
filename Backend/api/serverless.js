@@ -67,7 +67,7 @@ app.use(async (req, res, next) => {
     }
 });
 
-// Routes
+// Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
         success: true,
@@ -80,6 +80,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// CORS test endpoint
 app.get('/api/cors-test', (req, res) => {
     res.json({
         success: true,
@@ -89,10 +90,12 @@ app.get('/api/cors-test', (req, res) => {
     });
 });
 
+// Simple test endpoint
 app.get('/home', (req, res) => {
     res.send('hello');
 });
 
+// API routes
 app.use('/api/users', userRouter);
 
 // Error handling middleware
@@ -109,8 +112,10 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
-        message: 'Route not found'
+        message: 'Route not found',
+        path: req.originalUrl
     });
 });
 
+// Export for Vercel serverless functions
 export default app;
