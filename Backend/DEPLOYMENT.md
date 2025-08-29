@@ -41,7 +41,7 @@ In your Vercel dashboard:
    ```
    MONGO_DB=your_mongodb_connection_string
    NODE_ENV=production
-   CORS_ORIGINS=http://localhost:5173,http://localhost:5174
+   CORS_ORIGINS=http://localhost:5173,http://localhost:5174,https://expenses-tracker-brown-eta.vercel.app
    CORS_ALLOW_ALL=false
    ```
 
