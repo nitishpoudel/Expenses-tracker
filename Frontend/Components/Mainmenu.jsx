@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { PlusCircle, Edit, Trash2, DollarSign, TrendingUp, Calendar, PieChart, Home, FileText, LogOut, HelpCircle, Menu, X } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../src/config/api.js';
 
 const ExpenseTracker = () => {
   const [expenses, setExpenses] = useState([]);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     id: null,
@@ -96,9 +99,42 @@ const ExpenseTracker = () => {
     { id: 'logout', label: 'Logout', icon: LogOut }
   ];
 
+  const handleLogout = async () => {
+    try {
+      // Call logout API
+      const response = await fetch(API_ENDPOINTS.LOGOUT, {
+        method: 'POST',
+        credentials: 'include', // Include cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Clear any local storage or session storage if needed
+        localStorage.removeItem('user');
+        sessionStorage.clear();
+        
+        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        console.log("logout sucessfully");
+        
+        // Navigate to login page
+        navigate('/login');
+      } else {
+        console.error('Logout failed');
+        // Still navigate to login even if API call fails
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Navigate to login even if there's an error
+      navigate('/login');
+    }
+  };
+
   const handleSidebarClick = (itemId) => {
     if (itemId === 'logout') {
-      alert('Logout functionality would be implemented here');
+      handleLogout();
       return;
     }
     setActiveTab(itemId);
