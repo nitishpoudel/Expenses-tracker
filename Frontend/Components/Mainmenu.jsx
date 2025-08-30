@@ -95,7 +95,7 @@ const ExpenseTracker = () => {
   const sidebarItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'expenses', label: 'Expense Tracker', icon: FileText },
-    { id: 'support', label: 'Support', icon: HelpCircle },
+    { id: 'support', label: 'Chat with AI', icon: HelpCircle },
     { id: 'logout', label: 'Logout', icon: LogOut }
   ];
 
@@ -179,7 +179,7 @@ const ExpenseTracker = () => {
       case 'support':
         return (
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Support & Help</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Chat with AI</h2>
             <div className="space-y-6">
               <div className="border-l-4 border-blue-500 pl-4">
                 <h3 className="text-xl font-semibold mb-2">How to Add Expenses</h3>
@@ -200,8 +200,11 @@ const ExpenseTracker = () => {
             </div>
             <div className="mt-8 p-4 bg-blue-50 rounded-lg">
               <p className="text-blue-800">
-                <strong>Need more help?</strong> Contact our support team at support@expensetracker.com
+                <strong>Need more help?</strong> Contact our support team at nitishpaudel260@gmail.com
               </p>
+                 <a href="/help" className="font-bold text-indigo-600 hover:text-indigo-500 transition-colors duration-200 mt-7">
+              click here to chat with AI!!!
+            </a>
             </div>
           </div>
         );

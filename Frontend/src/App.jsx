@@ -4,6 +4,8 @@ import LoginForm from '../Components/Login';
 import SignUpForm from '../Components/Signup';
 import ExpenseTracker from "../Components/Mainmenu";
 
+import AI from "../Components/ChatAi";
+
 
 function App() {
   return (
@@ -20,9 +22,11 @@ function App() {
 
         {/* Dashboard Page */}
         <Route path="/dashboard" element={<ExpenseTracker />} />
+        <Route  path="/help" element={<AI/>}/>
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
