@@ -71,7 +71,7 @@ const AI = () => {
       <header className="p-4 bg-white shadow-md flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-800 flex items-center">
           <SparklesIcon className="h-6 w-6 text-indigo-500 mr-2" />
-          Gemini AI Chat
+          Personal AI
         </h1>
         <div className="flex items-center space-x-2">
           {/* Made API key input responsive */}
@@ -97,8 +97,8 @@ const AI = () => {
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <SunIcon className="w-16 h-16 text-gray-300 mb-4 animate-pulse" />
-            <p className="text-lg">Start a conversation with Gemini!</p>
-            <p className="text-sm">Enter your API key above to begin.</p>
+            <p className="text-lg">Start a conversation </p>
+            <p className="text-sm">Enjoy!!</p>
           </div>
         )}
 
@@ -148,7 +148,7 @@ const AI = () => {
           )}
           {/* Changed width to be flexible within the container */}
           <textarea
-            className="flex-1 p-3 text-xs rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
+            className="flex-1 p-3 text-1.5xl rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
             rows="1"
             placeholder="Send a message..."
             value={input}
