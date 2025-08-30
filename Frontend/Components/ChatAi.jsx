@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SparklesIcon, PaperAirplaneIcon, SunIcon, UserIcon, WifiIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 const AI = () => {
-  const [apiKey, setApiKey] = useState('AIzaSyBViMQ54r-5-R_QkNcSKuAw9q2LAeeuUyc');
+  const [apiKey, setApiKey] = useState('AIzaSyBirSNInELM3XZHoD1DQz098doJZXq6KYM');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -66,17 +66,18 @@ const AI = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans antialiased">
+    <div className="flex flex-col h-screen bg-gray-100 font-sans antialiased overflow-x-hidden">
       {/* Header */}
       <header className="p-4 bg-white shadow-md flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-800 flex items-center">
           <SparklesIcon className="h-6 w-6 text-indigo-500 mr-2" />
-          Made by nitish
+          Gemini AI Chat
         </h1>
         <div className="flex items-center space-x-2">
+          {/* Made API key input responsive */}
           <input
             type="text"
-            className="w-48 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+            className="w-full sm:w-48 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
             placeholder="Enter API Key here..."
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
@@ -96,7 +97,7 @@ const AI = () => {
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <SunIcon className="w-16 h-16 text-gray-300 mb-4 animate-pulse" />
-            <p className="text-lg">Start a conversation with AI!</p>
+            <p className="text-lg">Start a conversation with Gemini!</p>
             <p className="text-sm">Enter your API key above to begin.</p>
           </div>
         )}
@@ -129,7 +130,7 @@ const AI = () => {
           <div className="flex justify-start">
             <div className="flex items-center p-4 rounded-3xl shadow-sm bg-white text-gray-500 rounded-bl-none border border-gray-200">
               <span className="animate-spin h-4 w-4 rounded-full border-2 border-t-2 border-indigo-500 mr-2"></span>
-              <p>AI is typing...</p>
+              <p>Gemini is typing...</p>
             </div>
           </div>
         )}
@@ -137,15 +138,17 @@ const AI = () => {
       </main>
 
       {/* Input Area */}
-      <div className="p-4 bg-white shadow-inner flex items-center justify-center  ">
-        <div className="flex w-full max-w-screen-xl  justify-center items-center space-x-3">
+      <div className="p-4 bg-white shadow-inner flex items-center justify-center">
+        {/* Confined input container to a max width and centered it */}
+        <div className="flex w-full max-w-screen-xl items-center space-x-3">
           {apiKey.length > 0 ? (
             <WifiIcon className="h-6 w-6 text-green-500" title="API Key provided" />
           ) : (
             <ExclamationTriangleIcon className="h-6 w-6 text-red-500" title="API Key is missing" />
           )}
+          {/* Changed width to be flexible within the container */}
           <textarea
-            className="w-full md:w-3/4 lg:w-1/2 p-3 text-xs rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
+            className="flex-1 p-3 text-xs rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
             rows="1"
             placeholder="Send a message..."
             value={input}
