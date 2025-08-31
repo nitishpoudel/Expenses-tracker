@@ -120,7 +120,7 @@ const AI = () => {
                 ) : (
                   <SparklesIcon className="h-4 w-4 mr-2 text-indigo-500" />
                 )}
-                <span className="font-semibold">{msg.role === 'user' ? 'You' : 'Gemini'}</span>
+                <span className="font-semibold">{msg.role === 'user' ? 'You' : 'AI '}</span>
               </div>
               <p className="whitespace-pre-wrap">{msg.content}</p>
             </div>
@@ -130,7 +130,7 @@ const AI = () => {
           <div className="flex justify-start">
             <div className="flex items-center p-4 rounded-3xl shadow-sm bg-white text-gray-500 rounded-bl-none border border-gray-200">
               <span className="animate-spin h-4 w-4 rounded-full border-2 border-t-2 border-indigo-500 mr-2"></span>
-              <p>Gemini is typing...</p>
+              <p>AI is typing...</p>
             </div>
           </div>
         )}
@@ -146,7 +146,7 @@ const AI = () => {
           ) : (
             <ExclamationTriangleIcon className="h-6 w-6 text-red-500" title="API Key is missing" />
           )}
-          {/* Changed width to be flexible within the container */}
+          
           <textarea
             className="flex-1 p-3 text-1.5xl rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
             rows="1"
