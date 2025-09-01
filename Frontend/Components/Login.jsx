@@ -48,6 +48,7 @@ export default function LoginForm() {
   };
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
     
     const newErrors = validateForm();
@@ -292,6 +293,9 @@ export default function LoginForm() {
           </p>
         </div>
       </div>
+   
+
     </div>
+    
   );
 }

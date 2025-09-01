@@ -95,7 +95,7 @@ const ExpenseTracker = () => {
   const sidebarItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'expenses', label: 'Expense Tracker', icon: FileText },
-    { id: 'support', label: 'Chat with AI', icon: HelpCircle },
+    { id: 'support', label: 'Support', icon: HelpCircle },
     { id: 'logout', label: 'Logout', icon: LogOut }
   ];
 
