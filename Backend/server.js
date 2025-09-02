@@ -40,7 +40,7 @@ app.use(async (req, res, next) => {
 
 // Add routes to the app (after database connection middleware)
 app.get('/home',(req,res) => {
-    res.send('hello')
+    res.send('hello from server')
 })
 
 // Health check endpoint
