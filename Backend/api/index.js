@@ -1,4 +1,6 @@
 import app from '../app.js';
 
-// Export the Express app for Vercel serverless functions
-export default app;
+// Standard Vercel serverless function format
+export default function handler(req, res) {
+  return app(req, res);
+}
