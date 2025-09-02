@@ -116,10 +116,10 @@ export const login = async(req, res) => {
         })
     }
     const user = await createUser.findOne({email})
-    console.log('🔍 Login attempt for email:', email);
-    console.log('🔍 User found:', user ? 'Yes' : 'No');
+    console.log(' Login attempt for email:', email);
+    console.log(' User found:', user ? 'Yes' : 'No');
     if (user) {
-        console.log('🔍 User details:', {
+        console.log(' User details:', {
             id: user._id,
             email: user.email,
             isVerified: user.isVerified,
@@ -252,7 +252,7 @@ export const verifyEmail = async (req, res) => {
         user.verificationTokenExpiry = undefined;
         await user.save();
 
-        console.log('✅ User verified successfully:', user.email);
+        console.log(' User verified successfully:', user.email);
 
         return res.status(200).json({
             success: true,
