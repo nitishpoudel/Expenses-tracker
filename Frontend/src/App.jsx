@@ -3,7 +3,7 @@ import './App.css';
 import LoginForm from '../Components/Login';
 import SignUpForm from '../Components/Signup';
 import ExpenseTracker from "../Components/Mainmenu";
-
+import EmailVerification from "../Components/EmailVerification";
 import AI from "../Components/ChatAi";
 
 
@@ -19,6 +19,9 @@ function App() {
 
         {/* Signup Page */}
         <Route path="/signup" element={<SignUpForm />} />
+
+        {/* Email Verification Page */}
+        <Route path="/verify-email" element={<EmailVerification />} />
 
         {/* Dashboard Page */}
         <Route path="/dashboard" element={<ExpenseTracker />} />

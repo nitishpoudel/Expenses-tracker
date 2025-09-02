@@ -61,31 +61,29 @@ export default function LoginForm() {
     setErrors({});
     
     try {
-      const response = await fetch('http://localhost:8000/api/users/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({
-      email: formData.email,
-      password: formData.password,
-      rememberMe
-    }),
-  });
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          rememberMe
+        }),
+      });
         
-    const result = await response.json();
-  console.log("Login Response:", response.status, result);
+      const result = await response.json();
+      console.log("Login Response:", response.status, result);
         
-  if (response.status === 200) {
-    // store token if returned
-    if (result.token) {
-      localStorage.setItem("token", result.token);
-    }
-    setIsSuccess(true);
-    setFormData({ email: '', password: '' });
-    navigate('/dashboard');
-  } else {
-    setErrors({ submit: result.message || 'Invalid email or password' });
-  }
+      if (response.status === 200) {
+        // JWT token is automatically stored in HTTP-only cookie by the backend
+        // No need to manually store it in localStorage
+        setIsSuccess(true);
+        setFormData({ email: '', password: '' });
+        navigate('/dashboard');
+      } else {
+        setErrors({ submit: result.message || 'Invalid email or password' });
+      }
     } catch (error) {
       setErrors({ submit: 'Network error. Please try again.' });
     }

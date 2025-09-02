@@ -18,12 +18,69 @@ const ExpenseTracker = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState(() => {
+    // Get the saved tab from localStorage, default to 'home' if none exists
+    return localStorage.getItem('activeTab') || 'home';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const categories = ['Food', 'Transportation', 'Entertainment', 'Bills', 'Shopping', 'Healthcare', 'Other'];
   
   const pieColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00', '#ff00ff', '#00ffff'];
+
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
+
+  // Fetch expenses from database when component mounts or when expenses tab is selected
+  useEffect(() => {
+    if (activeTab === 'expenses') {
+      fetchExpenses();
+    }
+  }, [activeTab]);
+
+  // Check if user is authenticated and fetch expenses on initial load
+  useEffect(() => {
+    const checkAuthAndFetchExpenses = async () => {
+      // Check if JWT cookie exists
+      const hasJWT = document.cookie.includes('jwt=');
+      if (hasJWT && activeTab === 'expenses') {
+        await fetchExpenses();
+      }
+    };
+    
+    checkAuthAndFetchExpenses();
+  }, []);
+
+  // Fetch expenses from database
+  const fetchExpenses = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(API_ENDPOINTS.GET_EXPENSES, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setExpenses(data.expenses || []);
+        console.log('Expenses fetched successfully:', data.expenses);
+      } else {
+        console.error('Failed to fetch expenses');
+        setExpenses([]);
+      }
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      setExpenses([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Calculate totals and statistics
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -45,45 +102,109 @@ const ExpenseTracker = () => {
     return acc;
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.title || !form.amount || !form.category || !form.date) return;
 
-    if (isEditing) {
-      setExpenses(expenses.map(exp => 
-        exp.id === form.id 
-          ? { ...form, amount: parseFloat(form.amount) }
-          : exp
-      ));
-      setIsEditing(false);
-    } else {
-      const newExpense = {
-        id: Date.now(),
-        title: form.title,
-        amount: parseFloat(form.amount),
-        category: form.category,
-        date: form.date
-      };
-      setExpenses([...expenses, newExpense]);
-    }
+    try {
+      setLoading(true);
+      
+      if (isEditing) {
+        // Update existing expense
+        const response = await fetch(API_ENDPOINTS.UPDATE_EXPENSE, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: form.id,
+            title: form.title,
+            amount: form.amount,
+            category: form.category,
+            date: form.date
+          }),
+        });
 
-    setForm({ id: null, title: '', amount: '', category: '', date: '' });
-    setShowForm(false);
+        if (response.ok) {
+          const data = await response.json();
+          setExpenses(expenses.map(exp => 
+            exp._id === form.id 
+              ? data.expense
+              : exp
+          ));
+          console.log('Expense updated successfully:', data.expense);
+        } else {
+          console.error('Failed to update expense');
+        }
+        setIsEditing(false);
+      } else {
+        // Add new expense
+        const response = await fetch(API_ENDPOINTS.ADD_EXPENSE, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: form.title,
+            amount: form.amount,
+            category: form.category,
+            date: form.date
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setExpenses([data.expense, ...expenses]);
+          console.log('Expense added successfully:', data.expense);
+        } else {
+          console.error('Failed to add expense');
+        }
+      }
+
+      setForm({ id: null, title: '', amount: '', category: '', date: '' });
+      setShowForm(false);
+    } catch (error) {
+      console.error('Error saving expense:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (expense) => {
     setForm({
-      id: expense.id,
+      id: expense._id,
       title: expense.title,
       amount: expense.amount.toString(),
       category: expense.category,
-      date: expense.date
+      date: expense.date.split('T')[0] // Convert ISO date to YYYY-MM-DD format
     });
     setIsEditing(true);
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    setExpenses(expenses.filter(exp => exp.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_ENDPOINTS.DELETE_EXPENSE}/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setExpenses(expenses.filter(exp => exp._id !== id));
+        console.log('Expense deleted successfully');
+      } else {
+        console.error('Failed to delete expense');
+      }
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetForm = () => {
@@ -101,6 +222,8 @@ const ExpenseTracker = () => {
 
   const handleLogout = async () => {
     try {
+      console.log("User pressed logout - starting logout process");
+      
       // Call logout API
       const response = await fetch(API_ENDPOINTS.LOGOUT, {
         method: 'POST',
@@ -111,13 +234,15 @@ const ExpenseTracker = () => {
       });
 
       if (response.ok) {
+        console.log("Logout API call successful");
         // Clear any local storage or session storage if needed
         localStorage.removeItem('user');
         sessionStorage.clear();
         
+        // Clear cookies by setting them to expire
         document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        console.log("logout sucessfully");
         
+        console.log("Local data cleared, navigating to login page");
         // Navigate to login page
         navigate('/login');
       } else {
@@ -339,7 +464,7 @@ const ExpenseTracker = () => {
                         <YAxis />
                         <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Amount']} />
                         <Legend />
-                        <Bar dataKey="amount" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="amount" fill="#FF0000" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
@@ -388,14 +513,22 @@ const ExpenseTracker = () => {
                 </div>
               </div>
 
-              {/* Add Expense Button */}
-              <div className="mb-6">
+              {/* Add Expense Button and Refresh */}
+              <div className="mb-6 flex gap-4">
                 <button
                   onClick={() => setShowForm(!showForm)}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors duration-200"
                 >
                   <PlusCircle className="h-5 w-5" />
                   Add New Expense
+                </button>
+                <button
+                  onClick={fetchExpenses}
+                  disabled={loading}
+                  className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors duration-200"
+                >
+                  <TrendingUp className="h-5 w-5" />
+                  {loading ? 'Loading...' : 'Refresh'}
                 </button>
               </div>
 
@@ -460,13 +593,15 @@ const ExpenseTracker = () => {
                     <div className="md:col-span-2 lg:col-span-4 flex gap-3">
                       <button
                         onClick={handleSubmit}
-                        className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                        disabled={loading}
+                        className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition-colors duration-200"
                       >
-                        {isEditing ? 'Update Expense' : 'Add Expense'}
+                        {loading ? 'Saving...' : (isEditing ? 'Update Expense' : 'Add Expense')}
                       </button>
                       <button
                         onClick={resetForm}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                        disabled={loading}
+                        className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition-colors duration-200"
                       >
                         Cancel
                       </button>
@@ -494,7 +629,7 @@ const ExpenseTracker = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {expenses.map((expense) => (
-                        <tr key={expense.id} className="hover:bg-gray-50">
+                        <tr key={expense._id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">{expense.title}</div>
                           </td>
@@ -521,13 +656,15 @@ const ExpenseTracker = () => {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleEdit(expense)}
-                                className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                                disabled={loading}
+                                className="text-blue-600 hover:text-blue-900 disabled:text-gray-400 transition-colors duration-200"
                               >
                                 <Edit className="h-4 w-4" />
                               </button>
                               <button
-                                onClick={() => handleDelete(expense.id)}
-                                className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                                onClick={() => handleDelete(expense._id)}
+                                disabled={loading}
+                                className="text-red-600 hover:text-red-900 disabled:text-gray-400 transition-colors duration-200"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -539,7 +676,14 @@ const ExpenseTracker = () => {
                   </table>
                 </div>
                 
-                {expenses.length === 0 && (
+                {loading && (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <p className="text-gray-500 text-lg">Loading expenses...</p>
+                  </div>
+                )}
+                
+                {!loading && expenses.length === 0 && (
                   <div className="text-center py-12">
                     <p className="text-gray-500 text-lg">No expenses found</p>
                     <p className="text-gray-400">Add your first expense to get started!</p>

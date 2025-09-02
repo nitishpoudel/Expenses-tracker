@@ -43,7 +43,18 @@ app.get('/home',(req,res) => {
     res.send('hello')
 })
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Server is healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 app.use('/api/users',userRouter)
+
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {

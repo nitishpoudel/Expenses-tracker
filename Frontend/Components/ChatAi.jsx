@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SparklesIcon, PaperAirplaneIcon, SunIcon, UserIcon, WifiIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
+import { API_ENDPOINTS } from '../src/config/api.js';
 
 const AI = () => {
-  const [apiKey, setApiKey] = useState('AIzaSyBirSNInELM3XZHoD1DQz098doJZXq6KYM');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -16,11 +17,28 @@ const AI = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Check connection status on component mount
+  useEffect(() => {
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.HEALTH, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      setIsConnected(response.ok);
+    } catch (error) {
+      setIsConnected(false);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
-    if (!apiKey) {
-      alert('Please enter your API key.');
+    if (!isConnected) {
+      alert('Please check your connection to the AI service.');
       return;
     }
 
@@ -31,27 +49,30 @@ const AI = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: input }] }],
-          }),
-        }
-      );
+      const response = await fetch(API_ENDPOINTS.AI_GENERATE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          message: input
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error(`API call failed with status: ${response.status}`);
+        throw new Error(`AI service error: ${response.status}`);
       }
 
       const result = await response.json();
-      const botMessage = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
-      setMessages([...updatedMessages, { role: 'model', content: botMessage }]);
+      
+      if (result.success) {
+        const botMessage = result.response || "Sorry, I couldn't generate a response.";
+        setMessages([...updatedMessages, { role: 'model', content: botMessage }]);
+      } else {
+        throw new Error(result.message || 'Failed to get AI response');
+      }
 
     } catch (error) {
-      console.error('Error fetching from API:', error);
+      console.error('Error getting AI response:', error);
       setMessages([...updatedMessages, { role: 'model', content: `Error: ${error.message}` }]);
     } finally {
       setLoading(false);
@@ -74,21 +95,17 @@ const AI = () => {
           Personal AI
         </h1>
         <div className="flex items-center space-x-2">
-          {/* Made API key input responsive */}
-          <input
-            type="text"
-            className="w-full sm:w-48 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
-            placeholder="Enter API Key here..."
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-          />
-          <button
-            onClick={() => setApiKey('')}
-            className="p-2 text-sm text-gray-600 hover:text-red-500 transition duration-200"
-            title="Clear API Key"
-          >
-            Clear
-          </button>
+          {/* Connection status indicator */}
+          <div className="flex items-center space-x-2">
+            {isConnected ? (
+              <WifiIcon className="h-5 w-5 text-green-500" title="Connected to AI service" />
+            ) : (
+              <ExclamationTriangleIcon className="h-5 w-5 text-red-500" title="Not connected to AI service" />
+            )}
+            <span className="text-sm text-gray-600">
+              {isConnected ? 'Connected' : 'Disconnected'}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -141,10 +158,10 @@ const AI = () => {
       <div className="p-4 bg-white shadow-inner flex items-center justify-center">
         {/* Confined input container to a max width and centered it */}
         <div className="flex w-full max-w-screen-xl items-center space-x-3">
-          {apiKey.length > 0 ? (
-            <WifiIcon className="h-6 w-6 text-green-500" title="API Key provided" />
+          {isConnected ? (
+            <WifiIcon className="h-6 w-6 text-green-500" title="AI service connected" />
           ) : (
-            <ExclamationTriangleIcon className="h-6 w-6 text-red-500" title="API Key is missing" />
+            <ExclamationTriangleIcon className="h-6 w-6 text-red-500" title="AI service disconnected" />
           )}
           
           <textarea
@@ -158,7 +175,7 @@ const AI = () => {
           <button
             onClick={handleSendMessage}
             className="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition duration-200 shadow-md transform active:scale-95 disabled:bg-gray-400"
-            disabled={!input.trim() || loading}
+            disabled={!input.trim() || loading || !isConnected}
             title="Send"
           >
             <PaperAirplaneIcon className="h-5 w-5 rotate-45" />

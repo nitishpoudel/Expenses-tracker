@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { API_ENDPOINTS } from '../src/config/api.js';
 
-export default function SignUpForm() {
+function SignUpForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
+    firstname: '',
+    lastname: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -36,8 +37,12 @@ export default function SignUpForm() {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+    if (!formData.firstname.trim()) {
+      newErrors.firstname = 'First name is required';
+    }
+    
+    if (!formData.lastname.trim()) {
+      newErrors.lastname = 'Last name is required';
     }
     
     if (!formData.email.trim()) {
@@ -74,14 +79,15 @@ export default function SignUpForm() {
     setErrors({});
     
     try {
-      const response = await fetch('http://localhost:8000/api/users/register', {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
         body: JSON.stringify({
-          name: formData.name,
+          firstname: formData.firstname,
+          lastname: formData.lastname,
           email: formData.email,
           password: formData.password
         }),
@@ -93,9 +99,11 @@ export default function SignUpForm() {
 
       if (response.ok) {
         setIsSuccess(true);
-        setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+        setFormData({ firstname: '', lastname: '', email: '', password: '', confirmPassword: '' });
+        // Store email for verification page
+        localStorage.setItem('pendingVerificationEmail', formData.email);
         setTimeout(() => {
-          navigate('/login');
+          navigate('/verify-email');
         }, 2000);
       } else {
         setErrors({ submit: result.message || 'Registration failed. Please try again.' });
@@ -118,8 +126,8 @@ export default function SignUpForm() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome aboard!</h2>
-            <p className="text-gray-600 mb-6">Your account has been created successfully.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Account Created!</h2>
+            <p className="text-gray-600 mb-6">Your account has been created successfully. Please check your email for verification instructions.</p>
             <button
               onClick={() => setIsSuccess(false)}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
@@ -141,26 +149,49 @@ export default function SignUpForm() {
         </div>
 
         <div className="space-y-6">
-          {/* Name Input */}
+          {/* First Name Input */}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">First Name</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <User className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="firstname"
+                value={formData.firstname}
                 onChange={handleChange}
                 className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 ${
-                  errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                  errors.firstname ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                 }`}
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
               />
             </div>
-            {errors.name && (
-              <p className="text-red-600 text-sm animate-pulse">{errors.name}</p>
+            {errors.firstname && (
+              <p className="text-red-600 text-sm animate-pulse">{errors.firstname}</p>
+            )}
+          </div>
+
+          {/* Last Name Input */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="lastname"
+                value={formData.lastname}
+                onChange={handleChange}
+                className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 ${
+                  errors.lastname ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                }`}
+                placeholder="Enter your last name"
+              />
+            </div>
+            {errors.lastname && (
+              <p className="text-red-600 text-sm animate-pulse">{errors.lastname}</p>
             )}
           </div>
 
@@ -285,3 +316,5 @@ export default function SignUpForm() {
     </div>
   );
 }
+
+export default SignUpForm;

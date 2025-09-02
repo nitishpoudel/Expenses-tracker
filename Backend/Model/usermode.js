@@ -18,9 +18,24 @@ const userSchema = new mongoose.Schema({
             type: String, 
             required: true
             },
-          
-         
-    
+        isVerified: {
+            type: Boolean,
+            default: false
+        },
+        verificationToken: {
+            type: String
+        },
+        verificationTokenExpiry: {
+            type: Date
+        },
+        resetPasswordToken: {
+            type: String
+        },
+        resetPasswordExpiry: {
+            type: Date
+        }
+}, {
+    timestamps: true
 });
 
 export const createUser = mongoose.model("ChatApp", userSchema);

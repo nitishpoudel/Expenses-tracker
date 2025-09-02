@@ -1,0 +1,33 @@
+/home/nitish/Downloads/Cursor-0.50.5-x86_64.AppImage.zs-old: ignoring input
+Server is running on 8000
+Database connected successfully!
+Database connected successfully
+Processed data: {
+  finalFirstName: 'nitish',
+  finalLastName: 'Poudel',
+  email: 'nitishpaudel260@gmail.com',
+  password: 'nitish@12'
+}
+Checking if email exists: nitishpaudel260@gmail.com
+Hashing password...
+Creating user...
+User created successfully: new ObjectId('68b59568f712684e393deeeb')
+Error sending verification email: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials 98e67ed59e1d1-327f5bbd749sm9916405a91.0 - gsmtp
+    at SMTPConnection._formatError (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection._actionAUTHComplete (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:1588:34)
+    at SMTPConnection.<anonymous> (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:556:26)
+    at SMTPConnection._processResponse (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)
+    at SMTPConnection._onData (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)
+    at SMTPConnection._onSocketData (/home/nitish/Desktop/Chatapp/Backend/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)
+    at TLSSocket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5) {
+  code: 'EAUTH',
+  response: '535-5.7.8 Username and Password not accepted. For more information, go to\n' +
+    '535 5.7.8  https://support.google.com/mail/?p=BadCredentials 98e67ed59e1d1-327f5bbd749sm9916405a91.0 - gsmtp',
+  responseCode: 535,
+  command: 'AUTH PLAIN'
+}
+Failed to send verification email, but user was created
