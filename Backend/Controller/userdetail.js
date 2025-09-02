@@ -139,14 +139,14 @@ export const login = async(req, res) => {
     
     // TEMPORARY BYPASS: Allow login for existing verified users
     if (!user.isVerified && user.email === 'nitishpaudel260@gmail.com') {
-        console.log('🔍 TEMPORARY BYPASS: Allowing login for existing user');
+        console.log(' TEMPORARY BYPASS: Allowing login for existing user');
         // Update user verification status
         user.isVerified = true;
         await user.save();
     }
     
     if (!user.isVerified) {
-        console.log('🔍 User not verified, blocking login');
+        console.log(' User not verified, blocking login');
         return res.status(401).json({
             success: false,
             message: "Please verify your email before logging in. Check your inbox for the verification link."
@@ -206,14 +206,14 @@ export const verifyEmail = async (req, res) => {
         // Check if it's a 6-character code or full token
         if (token.length === 6) {
             // It's a 6-character verification code, find user with token starting with this code
-            console.log('🔍 Searching for user with 6-character code:', token);
+            console.log(' Searching for user with 6-character code:', token);
             user = await createUser.findOne({
                 verificationToken: { $regex: `^${token}`, $options: 'i' },
                 verificationTokenExpiry: { $gt: Date.now() }
             });
         } else {
             // It's a full token
-            console.log('🔍 Searching for user with full token');
+            console.log(' Searching for user with full token');
             user = await createUser.findOne({
                 verificationToken: token,
                 verificationTokenExpiry: { $gt: Date.now() }
