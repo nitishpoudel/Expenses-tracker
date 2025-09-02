@@ -39,8 +39,11 @@ app.use(async (req, res, next) => {
 });
 
 // Add routes to the app (after database connection middleware)
-app.get('/home',(req,res) => {
-    res.send('hello')
+app.get('/',(req,res) => {
+    res.send({
+        activeStatus:true,
+        error:false,
+    })
 })
 
 // Health check endpoint
