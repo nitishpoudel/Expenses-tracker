@@ -135,7 +135,7 @@ export const login = async(req, res) => {
     }
 
     // Check if email is verified
-    console.log('🔍 Checking verification status:', user.isVerified);
+    console.log(' Checking verification status:', user.isVerified);
     
     // TEMPORARY BYPASS: Allow login for existing verified users
     if (!user.isVerified && user.email === 'nitishpaudel260@gmail.com') {
@@ -192,7 +192,7 @@ export const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
         
-        console.log('🔍 Verification attempt with token:', token ? token.substring(0, 10) + '...' : 'undefined');
+        console.log(' Verification attempt with token:', token ? token.substring(0, 10) + '...' : 'undefined');
 
         if (!token) {
             return res.status(400).json({
