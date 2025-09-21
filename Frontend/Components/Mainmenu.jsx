@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from '../src/config/api.js';
 const ExpenseTracker = () => {
   const [expenses, setExpenses] = useState([]);
   const navigate = useNavigate();
+    const today = new Date().toISOString().split("T")[0];
 
   const [form, setForm] = useState({
     id: null,
@@ -584,6 +585,8 @@ const ExpenseTracker = () => {
                       <input
                         type="date"
                         value={form.date}
+                        max={today}
+
                         onChange={(e) => setForm({ ...form, date: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         required
