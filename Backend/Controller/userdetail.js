@@ -135,7 +135,7 @@ export const login = async(req, res) => {
     }
 
     // Check if email is verified
-    console.log(' Checking verification status:', user.isVerified);
+    console.log('  Checking verification status:', user.isVerified);
     
     // TEMPORARY BYPASS: Allow login for existing verified users
     if (!user.isVerified && user.email === 'nitishpaudel260@gmail.com') {
