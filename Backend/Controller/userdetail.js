@@ -79,7 +79,7 @@ export const register = async (req, res) => {
 
         // Send verification email
         const emailSent = await sendVerificationEmail(finalEmail, verificationToken, finalFirstName);
-        
+
         if (!emailSent) {
             console.log("Failed to send verification email, but user was created");
         }
@@ -126,7 +126,7 @@ export const login = async(req, res) => {
             hasVerificationToken: !!user.verificationToken
         });
     }
-    
+
     if(!user){
         return res.status(400).json({
             sucess:false,
@@ -136,7 +136,7 @@ export const login = async(req, res) => {
 
     // Check if email is verified
     console.log('  Checking verification status:', user.isVerified);
-    
+
     // TEMPORARY BYPASS: Allow login for existing verified users
     if (!user.isVerified && user.email === 'nitishpaudel260@gmail.com') {
         console.log(' TEMPORARY BYPASS: Allowing login for existing user');
@@ -144,7 +144,7 @@ export const login = async(req, res) => {
         user.isVerified = true;
         await user.save();
     }
-    
+
     if (!user.isVerified) {
         console.log(' User not verified, blocking login');
         return res.status(401).json({
@@ -160,7 +160,13 @@ export const login = async(req, res) => {
             message:"Invalid email or password",
         })
     }
-    const jwtSecret = process.env.SECRET_KEY || process.env.SCERATE_KEY;
+    const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.SCERATE_KEY;
+    if (!jwtSecret) {
+        return res.status(500).json({
+            sucess: false,
+            message: "Server JWT secret is not configured"
+        });
+    }
     const token = Jwt.sign({userId : user ._id }, jwtSecret,{
         expiresIn:"7d"
     })
@@ -177,13 +183,13 @@ export const login = async(req, res) => {
         user,
         token
     });
-        
+
     } catch (error) {
         return res.status(500).json({
             sucess:false,
             message:"failed to login"
         })
-        
+
     }
 }
 
@@ -191,7 +197,7 @@ export const login = async(req, res) => {
 export const verifyEmail = async (req, res) => {
     try {
         const { token } = req.params;
-        
+
         console.log(' Verification attempt with token:', token ? token.substring(0, 10) + '...' : 'undefined');
 
         if (!token) {
@@ -232,7 +238,7 @@ export const verifyEmail = async (req, res) => {
                     verificationToken: token
                 });
             }
-            
+
             if (expiredUser) {
                 return res.status(400).json({
                     success: false,
@@ -440,7 +446,7 @@ export  const logout = async(req,res) =>{
     return res.status(200).json({
         sucess:true,
         message:"logout sucessfull",
-        
+
     })
 }
 
@@ -449,7 +455,7 @@ export const addExpense = async (req, res) => {
     try {
         const { title, amount, category, date } = req.body;
         const token = req.cookies.jwt;
-        
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -457,7 +463,8 @@ export const addExpense = async (req, res) => {
             });
         }
 
-        const decoded = Jwt.verify(token, process.env.SECRET_KEY || process.env.SCERATE_KEY);
+        const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.SCERATE_KEY;
+        const decoded = Jwt.verify(token, jwtSecret);
         const userId = decoded.userId;
 
         const newExpense = new Expense({
@@ -489,7 +496,7 @@ export const addExpense = async (req, res) => {
 export const getUserExpenses = async (req, res) => {
     try {
         const token = req.cookies.jwt;
-        
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -497,7 +504,8 @@ export const getUserExpenses = async (req, res) => {
             });
         }
 
-        const decoded = Jwt.verify(token, process.env.SECRET_KEY || process.env.SCERATE_KEY);
+        const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.SCERATE_KEY;
+        const decoded = Jwt.verify(token, jwtSecret);
         const userId = decoded.userId;
 
         const expenses = await Expense.find({ userId }).sort({ date: -1 });
@@ -521,7 +529,7 @@ export const updateExpense = async (req, res) => {
     try {
         const { id, title, amount, category, date } = req.body;
         const token = req.cookies.jwt;
-        
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -529,7 +537,8 @@ export const updateExpense = async (req, res) => {
             });
         }
 
-        const decoded = Jwt.verify(token, process.env.SECRET_KEY || process.env.SCERATE_KEY);
+        const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.SCERATE_KEY;
+        const decoded = Jwt.verify(token, jwtSecret);
         const userId = decoded.userId;
 
         const expense = await Expense.findOneAndUpdate(
@@ -565,7 +574,7 @@ export const deleteExpense = async (req, res) => {
     try {
         const { id } = req.params;
         const token = req.cookies.jwt;
-        
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -573,7 +582,8 @@ export const deleteExpense = async (req, res) => {
             });
         }
 
-        const decoded = Jwt.verify(token, process.env.SECRET_KEY || process.env.SCERATE_KEY);
+        const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY || process.env.SCERATE_KEY;
+        const decoded = Jwt.verify(token, jwtSecret);
         const userId = decoded.userId;
 
         const expense = await Expense.findOneAndDelete({ _id: id, userId });
